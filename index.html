@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QazaqLearner — 3-in-1 Language Game Hub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --success: #16a34a;
+      --error: #dc2626;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --card-back: #1e293b;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --radius: 16px;
+      --shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -2px rgba(0,0,0,0.05);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Header */
+    header {
+      width: 100%;
+      max-width: 800px;
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--card-bg);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .brand h1 {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    .brand p {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .stats {
+      display: flex;
+      gap: 12px;
+    }
+
+    .stat-badge {
+      padding: 6px 14px;
+      background: #eff6ff;
+      color: var(--primary);
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 0.85rem;
+    }
+
+    .stat-badge.xp {
+      background: #fef3c7;
+      color: #d97706;
+    }
+
+    /* Navigation Mode Selector Tabs */
+    nav.mode-nav {
+      width: 100%;
+      max-width: 800px;
+      padding: 16px 20px 0;
+      display: flex;
+      gap: 8px;
+    }
+
+    .nav-tab {
+      flex: 1;
+      padding: 12px 8px;
+      background: #e2e8f0;
+      border: none;
+      border-radius: 12px 12px 0 0;
+      font-family: inherit;
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: center;
+    }
+
+    .nav-tab.active {
+      background: var(--card-bg);
+      color: var(--primary);
+      border-top: 3px solid var(--primary);
+      box-shadow: 0 -2px 8px rgba(0,0,0,0.03);
+    }
+
+    /* Main Container */
+    main {
+      width: 100%;
+      max-width: 800px;
+      padding: 24px 20px;
+      flex: 1;
+    }
+
+    .game-section {
+      display: none;
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 24px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+    }
+
+    .game-section.active {
+      display: block;
+    }
+
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .section-subtitle {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+    }
+
+    /* ----------------------------------
+       PART 1: Quiz Learning Mode (Earlier Version)
+    ----------------------------------- */
+    .quiz-card {
+      background: #f8fafc;
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px 20px;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .quiz-card .category-tag {
+      font-size: 0.75rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: var(--primary);
+      letter-spacing: 0.05em;
+    }
+
+    .quiz-card .word-prompt {
+      font-size: 2rem;
+      font-weight: 800;
+      margin: 12px 0 4px;
+    }
+
+    .quiz-card .phonetic {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      font-style: italic;
+    }
+
+    .quiz-options {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .quiz-opt-btn {
+      padding: 16px;
+      background: var(--card-bg);
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      font-family: inherit;
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .quiz-opt-btn:hover:not(:disabled) {
+      border-color: var(--primary);
+      background: #eff6ff;
+    }
+
+    .quiz-opt-btn.correct {
+      background: #f0fdf4 !important;
+      border-color: var(--success) !important;
+      color: var(--success);
+    }
+
+    .quiz-opt-btn.wrong {
+      background: #fef2f2 !important;
+      border-color: var(--error) !important;
+      color: var(--error);
+    }
+
+    /* ----------------------------------
+       PART 2 & 3: Card Matching Grids
+    ----------------------------------- */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 12px;
+    }
+
+    @media (min-width: 520px) {
+      .cards-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    /* Card styling */
+    .matching-card {
+      height: 100px;
+      perspective: 1000px;
+      cursor: pointer;
+    }
+
+    .card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      text-align: center;
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      transform-style: preserve-3d;
+    }
+
+    /* Open game doesn't flip cards, memory game flips cards */
+    .matching-card.flipped .card-inner {
+      transform: rotateY(180deg);
+    }
+
+    .card-front, .card-back-face {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+      border-radius: var(--radius);
+      border: 2px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 8px;
+    }
+
+    .card-front {
+      background: var(--card-bg);
+      color: var(--text);
+      box-shadow: var(--shadow);
+    }
+
+    /* For Blind Game Face-Down Side */
+    .card-back-face {
+      background: var(--card-back);
+      color: white;
+      transform: rotateY(180deg);
+      font-size: 1.5rem;
+      font-weight: 800;
+    }
+
+    .matching-card.selected .card-front {
+      border-color: var(--primary);
+      background: #eff6ff;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+    }
+
+    .matching-card.matched .card-front {
+      border-color: var(--success);
+      background: #f0fdf4;
+      opacity: 0.65;
+    }
+
+    .matching-card.mismatch .card-front {
+      border-color: var(--error);
+      background: #fef2f2;
+      animation: shake 0.4s ease-in-out;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-5px); }
+      40%, 80% { transform: translateX(5px); }
+    }
+
+    .card-word {
+      font-size: 0.95rem;
+      font-weight: 700;
+    }
+
+    .card-lang {
+      font-size: 0.65rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* Controls */
+    .controls-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .btn-action {
+      padding: 10px 18px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-family: inherit;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    .btn-action:hover {
+      background: var(--primary-hover);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="brand">
+      <h1>QazaqLearner</h1>
+      <p>English ➔ Қазақша Hub</p>
+    </div>
+    <div class="stats">
+      <div class="stat-badge">🎯 Score: <span id="score-counter">0</span></div>
+      <div class="stat-badge xp">⚡ <span id="xp-counter">0 XP</span></div>
+    </div>
+  </header>
+
+  <!-- Navigation Tabs for 3 Game Modes -->
+  <nav class="mode-nav">
+    <button class="nav-tab active" onclick="switchMode('part1')">1st Part: Quiz Game</button>
+    <button class="nav-tab" onclick="switchMode('part2')">2nd Part: Card Match</button>
+    <button class="nav-tab" onclick="switchMode('part3')">3rd Part: Blind Match</button>
+  </nav>
+
+  <main>
+    <!-- PART 1: Earlier Version Flashcard Quiz -->
+    <section id="part1" class="game-section active">
+      <div class="controls-row">
+        <div>
+          <div class="section-title">1st Part: Flashcard Quiz Game</div>
+          <div class="section-subtitle">Read the English word and choose the correct Kazakh translation.</div>
+        </div>
+        <button class="btn-action" onclick="initPart1()">Reset Quiz</button>
+      </div>
+
+      <div class="quiz-card">
+        <span class="category-tag" id="p1-category">Category</span>
+        <div class="word-prompt" id="p1-prompt">Loading...</div>
+        <div class="phonetic" id="p1-phonetic">/phonetic/</div>
+      </div>
+
+      <div class="quiz-options" id="p1-options">
+        <!-- Dynamic Quiz Buttons -->
+      </div>
+    </section>
+
+    <!-- PART 2: Current Card Matching Game -->
+    <section id="part2" class="game-section">
+      <div class="controls-row">
+        <div>
+          <div class="section-title">2nd Part: Open Card Matching Game</div>
+          <div class="section-subtitle">Tap an English card, then tap its Kazakh translation.</div>
+        </div>
+        <button class="btn-action" onclick="initPart2()">New Cards</button>
+      </div>
+
+      <div class="cards-grid" id="part2-grid">
+        <!-- Dynamic Open Cards -->
+      </div>
+    </section>
+
+    <!-- PART 3: Blind Card Matching Game (Memory Style) -->
+    <section id="part3" class="game-section">
+      <div class="controls-row">
+        <div>
+          <div class="section-title">3rd Part: Blind Card Matching Game</div>
+          <div class="section-subtitle">Memory challenge! Flip two hidden cards to find matching pair translations.</div>
+        </div>
+        <button class="btn-action" onclick="initPart3()">Shuffle Deck</button>
+      </div>
+
+      <div class="cards-grid" id="part3-grid">
+        <!-- Dynamic Blind Memory Cards -->
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // Unified Vocabulary Data Source
+    const vocabulary = [
+      { id: 1, en: "Hello", kk: "Сәлеметсіз бе", phonetic: "Sälemetsiz be", category: "Basics" },
+      { id: 2, en: "Thank you", kk: "Рақмет", phonetic: "Raqmet", category: "Basics" },
+      { id: 3, en: "Good morning", kk: "Қайырлы таң", phonetic: "Qayırlı tañ", category: "Basics" },
+      { id: 4, en: "Water", kk: "Су", phonetic: "Su", category: "Nature" },
+      { id: 5, en: "Bread", kk: "Нан", phonetic: "Nan", category: "Food" },
+      { id: 6, en: "Mother", kk: "Ана", phonetic: "Ana", category: "Family" },
+      { id: 7, en: "Father", kk: "Әке", phonetic: "Äke", category: "Family" },
+      { id: 8, en: "Friend", kk: "Дос", phonetic: "Dos", category: "People" }
+    ];
+
+    // Global Stats
+    let score = 0;
+    let xp = 0;
+
+    function addReward(pts, xpGain) {
+      score += pts;
+      xp += xpGain;
+      document.getElementById('score-counter').textContent = score;
+      document.getElementById('xp-counter').textContent = `${xp} XP`;
+    }
+
+    function shuffle(arr) {
+      return [...arr].sort(() => Math.random() - 0.5);
+    }
+
+    // Switch between Game Modes (Tabs)
+    function switchMode(modeId) {
+      document.querySelectorAll('.game-section').forEach(sec => sec.classList.remove('active'));
+      document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+
+      document.getElementById(modeId).classList.add('active');
+      event.target.classList.add('active');
+
+      if (modeId === 'part1') initPart1();
+      if (modeId === 'part2') initPart2();
+      if (modeId === 'part3') initPart3();
+    }
+
+    /* --------------------------------------------------
+       PART 1 LOGIC: Flashcard Quiz
+    -------------------------------------------------- */
+    let p1CurrentIndex = 0;
+    let p1List = [];
+
+    function initPart1() {
+      p1List = shuffle(vocabulary);
+      p1CurrentIndex = 0;
+      loadPart1Question();
+    }
+
+    function loadPart1Question() {
+      if (p1CurrentIndex >= p1List.length) p1CurrentIndex = 0;
+      const current = p1List[p1CurrentIndex];
+
+      document.getElementById('p1-category').textContent = current.category;
+      document.getElementById('p1-prompt').textContent = current.en;
+      document.getElementById('p1-phonetic').textContent = `/${current.phonetic}/`;
+
+      // Generate options (1 correct, 3 wrong)
+      const distractors = vocabulary.filter(v => v.id !== current.id);
+      const chosenDistractors = shuffle(distractors).slice(0, 3);
+      const options = shuffle([current, ...chosenDistractors]);
+
+      const optionsGrid = document.getElementById('p1-options');
+      optionsGrid.innerHTML = '';
+
+      options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'quiz-opt-btn';
+        btn.textContent = opt.kk;
+        btn.onclick = () => {
+          const allBtns = optionsGrid.querySelectorAll('.quiz-opt-btn');
+          allBtns.forEach(b => b.disabled = true);
+
+          if (opt.id === current.id) {
+            btn.classList.add('correct');
+            addReward(1, 10);
+          } else {
+            btn.classList.add('wrong');
+            allBtns.forEach(b => {
+              if (b.textContent === current.kk) b.classList.add('correct');
+            });
+          }
+
+          setTimeout(() => {
+            p1CurrentIndex++;
+            loadPart1Question();
+          }, 1200);
+        };
+        optionsGrid.appendChild(btn);
+      });
+    }
+
+    /* --------------------------------------------------
+       PART 2 LOGIC: Open Matching Game
+    -------------------------------------------------- */
+    let p2Selected = null;
+    let p2Processing = false;
+
+    function initPart2() {
+      const grid = document.getElementById('part2-grid');
+      grid.innerHTML = '';
+      p2Selected = null;
+      p2Processing = false;
+
+      const sample = shuffle(vocabulary).slice(0, 6);
+      let cards = [];
+      sample.forEach(item => {
+        cards.push({ pairId: item.id, text: item.en, lang: 'EN' });
+        cards.push({ pairId: item.id, text: item.kk, lang: 'KK' });
+      });
+      cards = shuffle(cards);
+
+      cards.forEach(data => {
+        const card = document.createElement('div');
+        card.className = 'matching-card';
+        card.innerHTML = `
+          <div class="card-inner">
+            <div class="card-front">
+              <div class="card-word">${data.text}</div>
+              <div class="card-lang">${data.lang === 'EN' ? 'English' : 'Қазақша'}</div>
+            </div>
+          </div>
+        `;
+
+        card.onclick = () => {
+          if (p2Processing || card.classList.contains('matched') || card.classList.contains('selected')) return;
+
+          card.classList.add('selected');
+
+          if (!p2Selected) {
+            p2Selected = { element: card, data: data };
+          } else {
+            if (p2Selected.element === card) return;
+            p2Processing = true;
+
+            if (p2Selected.data.pairId === data.pairId && p2Selected.data.lang !== data.lang) {
+              setTimeout(() => {
+                p2Selected.element.classList.remove('selected');
+                card.classList.remove('selected');
+                p2Selected.element.classList.add('matched');
+                card.classList.add('matched');
+                addReward(1, 10);
+                p2Selected = null;
+                p2Processing = false;
+              }, 200);
+            } else {
+              setTimeout(() => {
+                p2Selected.element.classList.add('mismatch');
+                card.classList.add('mismatch');
+                setTimeout(() => {
+                  p2Selected.element.classList.remove('selected', 'mismatch');
+                  card.classList.remove('selected', 'mismatch');
+                  p2Selected = null;
+                  p2Processing = false;
+                }, 500);
+              }, 200);
+            }
+          }
+        };
+        grid.appendChild(card);
+      });
+    }
+
+    /* --------------------------------------------------
+       PART 3 LOGIC: Blind Card Matching Game (Memory)
+    -------------------------------------------------- */
+    let p3Selected = null;
+    let p3Processing = false;
+
+    function initPart3() {
+      const grid = document.getElementById('part3-grid');
+      grid.innerHTML = '';
+      p3Selected = null;
+      p3Processing = false;
+
+      const sample = shuffle(vocabulary).slice(0, 6);
+      let cards = [];
+      sample.forEach(item => {
+        cards.push({ pairId: item.id, text: item.en, lang: 'EN' });
+        cards.push({ pairId: item.id, text: item.kk, lang: 'KK' });
+      });
+      cards = shuffle(cards);
+
+      cards.forEach(data => {
+        const card = document.createElement('div');
+        card.className = 'matching-card flipped'; // Flipped initially shows card-back-face
+        card.innerHTML = `
+          <div class="card-inner">
+            <div class="card-front">
+              <div class="card-word">${data.text}</div>
+              <div class="card-lang">${data.lang === 'EN' ? 'English' : 'Қазақша'}</div>
+            </div>
+            <div class="card-back-face">?</div>
+          </div>
+        `;
+
+        card.onclick = () => {
+          if (p3Processing || card.classList.contains('matched') || !card.classList.contains('flipped')) return;
+
+          // Reveal card (remove flipped class to show front side)
+          card.classList.remove('flipped');
+          card.classList.add('selected');
+
+          if (!p3Selected) {
+            p3Selected = { element: card, data: data };
+          } else {
+            if (p3Selected.element === card) return;
+            p3Processing = true;
+
+            if (p3Selected.data.pairId === data.pairId && p3Selected.data.lang !== data.lang) {
+              setTimeout(() => {
+                p3Selected.element.classList.remove('selected');
+                card.classList.remove('selected');
+                p3Selected.element.classList.add('matched');
+                card.classList.add('matched');
+                addReward(2, 20); // Higher reward for blind memory match
+                p3Selected = null;
+                p3Processing = false;
+              }, 300);
+            } else {
+              setTimeout(() => {
+                p3Selected.element.classList.add('mismatch');
+                card.classList.add('mismatch');
+                setTimeout(() => {
+                  p3Selected.element.classList.remove('selected', 'mismatch');
+                  card.classList.remove('selected', 'mismatch');
+                  // Flip both back face down
+                  p3Selected.element.classList.add('flipped');
+                  card.classList.add('flipped');
+                  p3Selected = null;
+                  p3Processing = false;
+                }, 700);
+              }, 300);
+            }
+          }
+        };
+        grid.appendChild(card);
+      });
+    }
+
+    // Initialize Part 1 on page load
+    initPart1();
+  </script>
+</body>
+</html>
